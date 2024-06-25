@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "domain_suffix": [
+        "028028.xyz",
+        "test-ipv6.com",
+        "ip.sb",
+        "aircat.phicomm.com",
+        "cn.bing.com",
+        "wechat.com",
+        "hostloc.com",
+        "ty.uy",
+        "hdchina.org",
+        "pthome.net",
+        "hdhome.org",
+        "ourbits.club",
+        "keepfrds.com",
+        "totheglory.im",
+        "springsunday.net",
+        "discfan.net",
+        "hdsky.me",
+        "iptorrents.com",
+        "tjupt.org",
+        "pterclub.com",
+        "dicmusic.club",
+        "lemonhd.org",
+        "btschool.club",
+        "hddolby.com",
+        "nicept.net",
+        "open.cd",
+        "soulvoice.club",
+        "htpt.cc",
+        "torrentleech.org",
+        "pttime.org",
+        "hdtime.org",
+        "eastgame.org",
+        "audiences.me",
+        "gainbound.net",
+        "hares.top",
+        "ptsbao.club",
+        "sharkpt.net",
+        "zmpt.cc"
+      ],
+      "domain_keyword": [
+        "m-team",
+        "chdbits"
+      ]
+    }
+  ]
+}
