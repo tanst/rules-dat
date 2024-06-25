@@ -1,0 +1,33 @@
+name: Compile JSON to Binary Rule-Set
+
+on:
+  push:
+    paths:
+      - '**.json'
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Download and extract sing-box
+      run: |
+        wget https://github.com/SagerNet/sing-box/releases/download/v1.9.3/sing-box-1.9.3-linux-amd64.tar.gz
+        tar -xzvf sing-box-1.9.3-linux-amd64.tar.gz
+
+    - name: Compile JSON files to binary rule-set
+      run: |
+        for file in *.json; do
+          ./sing-box-1.9.3-linux-amd64/sing-box rule-set compile --output "${file%.json}.srs" "$file"
+        done
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add *.srs
+        git commit -m "Compile JSON to binary rule-set" || echo "No changes to commit"
+        git push
