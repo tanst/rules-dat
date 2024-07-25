@@ -20,43 +20,36 @@ jobs:
         python-version: '3.x'
 
     - name: Install dependencies
-      run: pip install requests beautifulsoup4
+      run: pip install requests
 
     - name: Generate TENCENT IP CIDR Data
       run: |
         python -c '
         import requests
-        from bs4 import BeautifulSoup
         import json
 
         url = "https://ipinfo.io/widget/demo/AS132203"
         response = requests.get(url)
 
         if response.status_code == 200:
-            soup = BeautifulSoup(response.text, "html.parser")
-            script_tag = soup.find("script", id="__NEXT_DATA__")
+            json_data = response.json()
+            cidr_list = [prefix["netblock"] for prefix in json_data.get("prefixes", [])]
 
-            if script_tag:
-                json_data = json.loads(script_tag.string)
-                asn_data = json_data["props"]["pageProps"]["asn"]
-                cidr_list = [prefix["cidr"] for prefix in asn_data.get("prefixes", [])]
+            output = {
+                "version": 1,
+                "rules": [
+                    {
+                        "ip_cidr": cidr_list
+                    }
+                ]
+            }
 
-                output = {
-                    "version": 1,
-                    "rules": [
-                        {
-                            "ip_cidr": cidr_list
-                        }
-                    ]
-                }
-
-                with open("tencent.json", "w") as f:
-                    json.dump(output, f, indent=4)
-            else:
-                print("Error: Unable to find JSON data in the page")
+            with open("tencent.json", "w") as f:
+                json.dump(output, f, indent=4)
         else:
             print(f"Error: Unable to fetch data (HTTP {response.status_code})")
         '
+
     - name: Commit and push changes
       run: |
         git config --global user.name "github-actions[bot]"
