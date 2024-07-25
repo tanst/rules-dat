@@ -1,25 +1,25 @@
 name: Compile JSON to Binary Rule-Set
 
 on:
-  # 每周1早上4点运行一次
   schedule:
-    - cron: '0 20 * * 0'  
+  # 每周1早上4点运行一次
+    - cron: '0 20 * * 0'
   workflow_dispatch:
 
 jobs:
-  generate:
+  generate-and-compile:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.x'
 
-    - name: Install dependencies
+    - name: Install Python dependencies
       run: pip install requests
 
     - name: Generate TENCENT IP CIDR Data
@@ -50,22 +50,6 @@ jobs:
             print(f"Error: Unable to fetch data (HTTP {response.status_code})")
         '
 
-    - name: Commit and push changes
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add tencent.json
-        git commit -m "Update TENCENT IP CIDR Data"
-        git push
-
-  compile:
-    needs: generate
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
     - name: Download and extract sing-box
       run: |
         wget https://github.com/SagerNet/sing-box/releases/download/v1.9.3/sing-box-1.9.3-linux-amd64.tar.gz
@@ -77,11 +61,11 @@ jobs:
           ./sing-box-1.9.3-linux-amd64/sing-box rule-set compile --output "${file%.json}.srs" "$file"
         done
 
-    - name: Commit and push SRS changes
+    - name: Commit and push changes
       run: |
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
-        git add *.srs
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Compile JSON to binary rule-set" && git push)
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add tencent.json *.srs
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update TENCENT IP CIDR Data and compile to SRS" && git push)
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
