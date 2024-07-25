@@ -44,8 +44,8 @@ jobs:
                 ]
             }
 
-            with open("tencent.json", "w") as f:
-                json.dump(output, f, indent=4)
+            with open("tencent.json", "w", encoding="utf-8") as f:
+                json.dump(output, f, indent=4, ensure_ascii=False)
         else:
             print(f"Error: Unable to fetch data (HTTP {response.status_code})")
         '
