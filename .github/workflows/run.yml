@@ -3,7 +3,7 @@ name: Compile JSON to Binary Rule-Set
 on:
   # 每周1早上4点运行一次
   schedule:
-    - cron: 0 20 * * 0 
+    - cron: '0 20 * * 0'  
   workflow_dispatch:
 
 jobs:
@@ -20,37 +20,43 @@ jobs:
         python-version: '3.x'
 
     - name: Install dependencies
-      run: pip install requests
+      run: pip install requests beautifulsoup4
 
     - name: Generate TENCENT IP CIDR Data
       run: |
         python -c '
-        import json
         import requests
+        from bs4 import BeautifulSoup
+        import json
 
-        API_TOKEN = "${{ secrets.IPINFO_API_TOKEN }}"
-        url = f"https://ipinfo.io/AS132203/json?token={API_TOKEN}"
+        url = "https://ipinfo.io/widget/demo/AS132203"
         response = requests.get(url)
 
         if response.status_code == 200:
-            data = response.json()
-            cidr_list = data.get("prefixes", [])
+            soup = BeautifulSoup(response.text, "html.parser")
+            script_tag = soup.find("script", id="__NEXT_DATA__")
 
-            output = {
-                "version": 1,
-                "rules": [
-                    {
-                        "ip_cidr": [cidr["cidr"] for cidr in cidr_list]
-                    }
-                ]
-            }
+            if script_tag:
+                json_data = json.loads(script_tag.string)
+                asn_data = json_data["props"]["pageProps"]["asn"]
+                cidr_list = [prefix["cidr"] for prefix in asn_data.get("prefixes", [])]
 
-            with open("tencent.json", "w") as f:
-                json.dump(output, f, indent=4)
+                output = {
+                    "version": 1,
+                    "rules": [
+                        {
+                            "ip_cidr": cidr_list
+                        }
+                    ]
+                }
+
+                with open("tencent.json", "w") as f:
+                    json.dump(output, f, indent=4)
+            else:
+                print("Error: Unable to find JSON data in the page")
         else:
             print(f"Error: Unable to fetch data (HTTP {response.status_code})")
         '
-
     - name: Commit and push changes
       run: |
         git config --global user.name "github-actions[bot]"
