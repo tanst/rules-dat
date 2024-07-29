@@ -64,10 +64,10 @@ jobs:
 
     - name: Commit and push changes
       run: |
-        git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add tencent.json tencent.srs
-        git commit -m "Update TENCENT IP CIDR Data and compile to SRS" || echo "No changes to commit"
-        git push
+        git config --global user.name "github-actions[bot]"
+        git add *.srs
+        git add *.json
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Compile JSON to binary rule-set" && git push)
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
