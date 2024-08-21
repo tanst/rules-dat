@@ -1,9 +1,9 @@
 name: Compile JSON to Binary Rule-Set
 
 on:
-  schedule:
-    - cron: '0 20 * * 0'  # Runs at 20:00 UTC every Sunday
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   generate-and-compile:
