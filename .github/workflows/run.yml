@@ -20,37 +20,7 @@ jobs:
 
     - name: Install Python dependencies
       run: pip install requests
-
-    - name: Generate TENCENT IP CIDR Data
-      run: |
-        python -c '
-        import requests
-        import json
-
-        url = "https://ipinfo.io/widget/demo/AS132203"
-        response = requests.get(url)
-
-        if response.status_code == 200:
-            json_data = response.json()
-            cidr_list = [prefix["netblock"] for prefix in json_data.get("prefixes", [])]
-
-            output = {
-                "version": 1,
-                "rules": [
-                    {
-                        "ip_cidr": cidr_list
-                    }
-                ]
-            }
-
-            with open("tencent.json", "w", encoding="utf-8") as f:
-                json.dump(output, f, indent=4, ensure_ascii=False)
-            print("Successfully updated tencent.json")
-        else:
-            print(f"Error: Unable to fetch data (HTTP {response.status_code})")
-            exit(1)
-        '
-
+      
     - name: Download and extract sing-box
       run: |
         wget https://github.com/SagerNet/sing-box/releases/download/v1.9.3/sing-box-1.9.3-linux-amd64.tar.gz
