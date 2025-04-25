@@ -3,6 +3,7 @@
   "rules": [
     {
       "domain_suffix": [
+        "jamesjack-my.sharepoint.com",
         "tw-001.s3.synologyc2.net",
         "028028.xyz",
         "test-ipv6.com",
